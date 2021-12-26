@@ -130,6 +130,7 @@ tar -xf trident-installer-21.10.1.tar.gz
 #Navigate to the directory
 cd trident-installer
 ```
+![image](https://user-images.githubusercontent.com/25719157/147401819-5f716695-6b05-4cf9-8faa-3947b1968f17.png)
 
 
 ### Deploy using Helm
@@ -153,11 +154,11 @@ helm install trident trident-operator-21.10.1.tgz
 ```
 
 Check the status of the helm deployment using `helm status trident`
-![[Pasted image 20211225225531.png]]
+![image](https://user-images.githubusercontent.com/25719157/147401836-2602cb31-735e-444b-8e73-668cdaf7e9f9.png)
 Check the status of the pods using `kubectl get pods`
-![[Pasted image 20211225225722.png]]
+![image](https://user-images.githubusercontent.com/25719157/147401847-3380d874-4332-4cf9-b6ee-fa23195fb467.png)
 Check the status of the installation using `tridentctl`
-![[Pasted image 20211225230108.png]]
+![image](https://user-images.githubusercontent.com/25719157/147401855-7192e6ba-1f8d-4c39-ad03-ccb0d1d5f378.png)
 
 ### Setup backend storage
 Now that trident is installed and ready to be used, it needs to have a storage platform that it needs to create PersistentVolumes on. This information is saved in a Json file and an object is created using `tridentctl` called a backend. In our case that backend is a NetApp storage SVM. The sample configuration for this type of backend is available in the `trident-nstaller` folder `trident-installer/sample-input/backends-samples`. In our case we will use `ontap-nas/backend-ontap-nas.json`. We will modify as per our environment:
@@ -176,17 +177,18 @@ Now that trident is installed and ready to be used, it needs to have a storage p
 ```
 
 These details can be filled up. The LIF information can be obtained from NetApp CLI:
-![[Pasted image 20211225232347.png]]
+![image](https://user-images.githubusercontent.com/25719157/147401880-7b9f495d-94e2-43d3-908f-0f5ad18f74d0.png)
 
 `vsadmin` can be modified and set with another password using:
- ![[Pasted image 20211225233023.png]]
+![image](https://user-images.githubusercontent.com/25719157/147401887-deccda14-3f53-4329-9e98-b63ddd7cd75f.png)
 
 Once the `JSON` file is ready we can execute:
 
 ```
 ./tridentctl -n trident create backend -f backend-ontap-nas.json
 ```
-![[Pasted image 20211225235001.png]]
+
+![image](https://user-images.githubusercontent.com/25719157/147401907-39407998-7ba0-41d6-ab91-32ac5234522c.png)
 
 Now the backend is online we can proceed with creating the storageClass and PersistentVolumeClaim. 
 
@@ -207,7 +209,8 @@ allowVolumeExpansion: true
 Save this to a YAML and execute `kubectl create -f ontap-nas-sc.yaml`
 StorageClass is ready:
 
-![[Pasted image 20211225235941.png]]
+![image](https://user-images.githubusercontent.com/25719157/147401927-50968678-f5f7-43cf-abc0-b5538cdff3a7.png)
+
 
 ### Create PersistentVolumeClaim 
 Now that the storageClass is ready, we can create a PVC that will use this storageClass and as a result a volume will be created on the storage side through trident. 
@@ -227,10 +230,10 @@ spec:
   ```
 
 Save this to YAML and execute `kubectl create -f pvc-ontap-nas.yaml`
-![[Pasted image 20211226000605.png]]
+![image](https://user-images.githubusercontent.com/25719157/147401939-fef1ce94-82d1-405e-acf9-cb136af58ba2.png)
 We can observe that a volume object `pvc-356fc9e5-f748-4517-9240-94ad7a332118` is created. We can also validate this from the NetApp CLI:
 
-![[Pasted image 20211226001233.png]]
+![image](https://user-images.githubusercontent.com/25719157/147401947-87d002e8-2eea-46b2-baac-2a99773e9c2c.png)
 
 ### Create a Pod that uses the PVC
 Lets create a Pod manifest file that uses the PVC `pvc-ontap-nas`
@@ -255,10 +258,13 @@ spec:
 ```
 
 Save this to a YAML file and execute `kubectl create -f nginx.yaml`
+![image](https://user-images.githubusercontent.com/25719157/147401952-6973c20c-8144-4025-80e6-451aed8bdecc.png)
+![image](https://user-images.githubusercontent.com/25719157/147401956-fbf0a4af-b82e-423b-a6c6-7f8856b17a1c.png)
 
-![[Pasted image 20211226002042.png]]
-![[Pasted image 20211226002110.png]]
 
 
 ### References:
 https://netapp.io/persistent-storage-provisioner-for-kubernetes/
+https://vmguru.com/2021/05/kubernetes-persistent-volumes-with-netapp-trident-part-1/
+https://kubernetes.io/docs/home/
+
